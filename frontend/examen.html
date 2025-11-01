@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CertiCode | Examen</title>
+  <link rel="stylesheet" href="css/estilo.css" />
+  <link rel="stylesheet" href="css/alertas.css" />
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div id="header-container"></div>
+
+  <main class="examen-container">
+    <div class="examen-header">
+      <h2 id="cert-nombre">Examen en curso...</h2>
+      <div class="examen-info">
+        <p><strong>Usuario:</strong> <span id="usuario-nombre"></span></p>
+        <p><strong>Tiempo:</strong> <span id="timer">00:00</span></p>
+      </div>
+    </div>
+
+    <div id="preguntas-container">
+      <!-- Preguntas se cargan aquí -->
+    </div>
+
+    <button id="btn-enviar" class="btn-primary" style="display:none;">Enviar Respuestas</button>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="js/alertas.js"></script>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/examen.js"></script>
+</body>
+</html>
