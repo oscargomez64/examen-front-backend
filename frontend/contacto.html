@@ -3,31 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CertiCode | Inicio</title>
+  <title>Contacto - CertiCode</title>
   <link rel="stylesheet" href="css/estilo.css" />
   <link rel="stylesheet" href="css/alertas.css" />
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <!-- CONTENEDOR DEL HEADER -->
+
   <div id="header-container"></div>
 
-<main>
-  <form id="form-contacto">
-    <input type="text" id="nombre" placeholder="Nombre" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <textarea id="mensaje" placeholder="Tu mensaje" required></textarea>
-    <button type="submit">Enviar</button>
-  </form>
-</main>
+  <main class="container">
+    <section class="contacto-form">
+      <h2>Contáctanos</h2>
+      <p>¿Tienes alguna duda? ¡Escríbenos y te responderemos pronto!</p>
 
-  <!-- CONTENEDOR DEL FOOTER -->
+      <form id="form-contacto">
+        <div class="form-group">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" name="nombre" required placeholder="Juan Pérez López" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" name="email" required placeholder="juan@ejemplo.com" />
+        </div>
+
+        <div class="form-group">
+          <label for="mensaje">Pregunta o duda</label>
+          <textarea id="mensaje" name="mensaje" rows="5" required placeholder="Escribe tu mensaje aquí..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Enviar Mensaje</button>
+      </form>
+    </section>
+  </main>
+
   <div id="footer-container"></div>
 
-  <!-- Scripts -->
+
   <script src="js/alertas.js"></script>
   <script src="js/header.js"></script>
   <script src="js/footer.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/contacto.js"></script>
 </body>
 </html>
