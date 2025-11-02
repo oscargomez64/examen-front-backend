@@ -557,3 +557,177 @@ body {
 .btn-primary:hover {
   background: #2980b9;
 }
+
+/* ========================================
+   HEADER RESPONSIVE - CORREGIDO
+   ======================================== */
+
+.header-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background: #2c3e50;
+  color: white;
+  position: relative;
+  z-index: 1000;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  height: 45px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.slogan {
+  font-size: 0.85rem;
+  color: #bdc3c7;
+  margin: 0;
+}
+
+.menu {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  transition: color 0.3s;
+}
+
+.menu a:hover {
+  color: #3498db;
+}
+
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.usuario-activo {
+  font-weight: 600;
+}
+
+.btn-login, .btn-logout {
+  background: #3498db;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-logout {
+  background: #e74c3c;
+}
+
+/* === HAMBURGUESA === */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.menu-toggle span {
+  width: 28px;
+  height: 3px;
+  background: white;
+  transition: 0.3s;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* === MÓVIL === */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: flex;
+    order: 2;
+  }
+
+  .menu {
+    order: 3;
+    flex-basis: 100%;
+    flex-direction: column;
+    background: #2c3e50;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 5%;
+    z-index: 999;
+  }
+
+  .menu.active {
+    max-height: 400px;
+    padding: 1rem 5%;
+    border-top: 1px solid #34495e;
+  }
+
+  .menu a {
+    padding: 1rem 0;
+    border-bottom: 1px solid #34495e;
+    width: 100%;
+  }
+
+  .auth-section {
+    order: 1;
+    margin-left: auto;
+  }
+
+  .brand-name {
+    font-size: 1.4rem;
+  }
+
+  .slogan {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-responsive {
+    padding: 1rem;
+  }
+  .logo-img {
+    height: 38px;
+  }
+}
