@@ -106,7 +106,7 @@ const submit = (req, res) => {
 
 const pagar = (req, res) => {
   const { certId } = req.body;
-  const userId = req.userId;
+  const userId = req.userId; // ← Viene del middleware
 
   const usuario = usuarios.find(u => u.id === userId);
   const cert = certificaciones.find(c => c.id === certId);
@@ -115,7 +115,6 @@ const pagar = (req, res) => {
     return res.status(400).json({ error: "Certificación no disponible" });
   }
 
-  // ← INICIALIZAR SI NO EXISTE
   if (!usuario.pagado) {
     usuario.pagado = {};
   }

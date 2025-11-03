@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function cargarCertificaciones() {
   try {
-    const response = await fetch('http://localhost:3000/api/exam/certificaciones');
+    const response = await fetch('http://192.168.1.9:3000/api/exam/certificaciones');
     const certificaciones = await response.json();
 
     const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -81,7 +81,7 @@ async function pagarCertificacion(certId) {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/exam/pagar', {
+    const response = await fetch('http://192.168.1.9:3000/api/exam/pagar', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ async function iniciarExamen(certId) {
   }
 
   try {
-    const response = await fetch('http://localhost:3000/api/exam/start', {
+    const response = await fetch('http://192.168.1.9:3000/api/exam/start', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

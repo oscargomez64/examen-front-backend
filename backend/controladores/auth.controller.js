@@ -18,21 +18,22 @@ const login = (req, res) => {
     return res.status(401).json({ error: "Credenciales incorrectas" });
   }
 
-  // Generar token
+  // GENERAR TOKEN
   const token = randomUUID();
+
+  // GUARDAR EN MAPA DE SESIONES
   sesiones.set(token, usuario.id);
 
-
-res.json({
-  mensaje: "Acceso permitido",
-  token,
-  usuario: {
-    id: usuario.id,
-    cuenta: usuario.cuenta,
-    nombre: usuario.nombre,
-    pagado: usuario.pagado || {}  // ← Aseguramos que exista
-  }
- });
+  res.json({
+    mensaje: "Acceso permitido",
+    token, // ← MISMO TOKEN
+    usuario: {
+      id: usuario.id,
+      cuenta: usuario.cuenta,
+      nombre: usuario.nombre,
+      pagado: usuario.pagado || {}
+    }
+  });
 };
 
 const verificarToken = (req, res, next) => {
@@ -46,11 +47,17 @@ const verificarToken = (req, res, next) => {
   const userId = sesiones.get(token);
 
   if (!userId) {
-    return res.status(401).json({ error: "Token inválido" });
+    return res.status(401).json({ error: "Token invalido" });
   }
 
+  // Adjuntar datos útiles
   req.userId = userId;
   req.token = token;
+
+  // Opcional: adjuntar usuario completo
+  const usuario = usuarios.find(u => u.id === userId);
+  req.usuario = usuario;
+
   next();
 };
 
