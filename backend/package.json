@@ -9,7 +9,7 @@
     "dev": "nodemon server.js"
   },
   "keywords": ["certificacion", "examen", "nodejs", "express"],
-  "author": "Tu Nombre / Equipo",
+  "author": "Usuario",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
