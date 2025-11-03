@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="Node.js">
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="#0f172a"/>
+  <path d="M32 12l18 10v20l-18 10-18-10V22z" fill="#16a34a" opacity="0.9"/>
+  <path d="M28 26h8v12c0 3-2 5-5 5-1 0-2 0-3-.5" fill="none" stroke="#e5fbe9" stroke-width="3" stroke-linecap="round"/>
+</svg>

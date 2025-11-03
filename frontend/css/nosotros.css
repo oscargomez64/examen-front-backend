@@ -1,0 +1,65 @@
+/* NOSOTROS PAGE - ESTILOS ESPECÍFICOS */
+
+/* Contenedor general */
+main {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* Título principal */
+main h1 {
+  font-size: 2.6rem;
+  color: #6e8efb;
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+/* Subtítulos */
+main h2 {
+  margin-top: 2.2rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.6rem;
+  color: #2c3e50;
+  position: relative;
+}
+
+main h2::after {
+  content: "";
+  width: 60px;
+  height: 3px;
+  background: #6e8efb;
+  display: block;
+  margin-top: 6px;
+  border-radius: 4px;
+}
+
+/* Párrafos */
+main p {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 1.1rem;
+  line-height: 1.75;
+}
+
+/* Listas */
+main ul, main ol {
+  margin-left: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.05rem;
+}
+
+main li {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+/* Texto destacado final */
+main p:last-of-type {
+  font-style: italic;
+  color: #6e8efb;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 2.5rem;
+}

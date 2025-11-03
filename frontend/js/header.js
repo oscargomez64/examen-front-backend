@@ -1,11 +1,15 @@
+// js/header.js
 function cargarHeader() {
   const usuario = JSON.parse(localStorage.getItem('usuario')) || null;
-  const token = localStorage.getItem('token');
 
-  document.getElementById('header-container').innerHTML = `
+  const root = document.getElementById('header-container');
+  if (!root) return;
+
+  root.innerHTML = `
     <header class="header-responsive">
       <div class="logo-section">
-        <img src="img/logo.png" alt="CertiCode Logo" class="logo-img" />
+        <!-- El src se ajusta dinámicamente abajo -->
+        <img id="logo-img" src="" alt="CertiCode Logo" class="logo-img" />
         <div class="brand-text">
           <h1 class="brand-name">CertiCode</h1>
           <p class="slogan">Certifica tu futuro, domina el código</p>
@@ -27,39 +31,74 @@ function cargarHeader() {
 
       <!-- Usuario -->
       <div class="auth-section">
-        ${usuario 
-          ? `<span class="usuario-activo">¡Hola, ${usuario.nombre.split(' ')[0]}!</span>
-             <button onclick="logout()" class="btn-logout">Cerrar sesión</button>`
-          : `<a href="login.html" class="btn-login">Iniciar sesión</a>`
+        ${
+          usuario
+            ? `<span class="usuario-activo">¡Hola, ${(usuario.nombre || '').split(' ')[0] || 'usuario'}!</span>
+               <button onclick="logout()" class="btn-logout">Cerrar sesión</button>`
+            : `<a href="login.html" class="btn-login">Iniciar sesión</a>`
         }
       </div>
     </header>
   `;
 
+  // === Selección robusta del logo (prueba varias extensiones) ===
+  (function setLogo() {
+    const logo = document.getElementById('logo-img');
+    if (!logo) return;
+
+    const candidatos = [
+      'img/logo.svg',
+      'img/logo.png',
+      'img/logo.webp',
+      'img/logo.jpg',
+      'img/logo.jpeg'
+    ];
+
+    let i = 0;
+    const tryNext = () => {
+      if (i >= candidatos.length) {
+        // Último recurso: mostrar solo texto alterno (ya está en alt)
+        console.warn('No se encontró ninguna variante del logo en /img/');
+        return;
+      }
+      logo.onerror = () => {
+        i++;
+        tryNext();
+      };
+      logo.src = candidatos[i];
+    };
+
+    tryNext();
+  })();
+
   // === JS DEL MENÚ RESPONSIVE ===
   const menuToggle = document.getElementById('menu-toggle');
   const navMenu = document.getElementById('nav-menu');
 
-  menuToggle.addEventListener('click', () => {
-    navMenu.classList.toggle('active');
-    menuToggle.classList.toggle('active');
-  });
-
-  // Cerrar al hacer clic en enlace
-  document.querySelectorAll('#nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-      navMenu.classList.remove('active');
-      menuToggle.classList.remove('active');
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+      menuToggle.classList.toggle('active');
     });
-  });
+
+    // Cerrar al hacer clic en enlace
+    document.querySelectorAll('#nav-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        menuToggle.classList.remove('active');
+      });
+    });
+  }
 }
 
 // Logout
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('usuario');
-  mostrarAlerta('exito', 'Sesión cerrada');
-  setTimeout(() => window.location.href = 'index.html', 1000);
+  if (typeof mostrarAlerta === 'function') {
+    mostrarAlerta('exito', 'Sesión cerrada');
+  }
+  setTimeout(() => (window.location.href = 'index.html'), 1000);
 }
 
 // Cargar

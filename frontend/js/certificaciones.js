@@ -3,6 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
   cargarCertificaciones();
 });
 
+window.retryImage = function (imgEl) {
+  try {
+    const raw = imgEl.getAttribute('data-candidates') || '';
+    const list = raw.split('|').map(s => s.trim()).filter(Boolean);
+    let idx = parseInt(imgEl.getAttribute('data-idx') || '0', 10);
+
+    idx += 1;
+    if (idx < list.length) {
+      imgEl.setAttribute('data-idx', String(idx));
+      imgEl.src = list[idx];
+    } else {
+      imgEl.onerror = null;
+    }
+  } catch (_) {
+    imgEl.onerror = null;
+  }
+};
+
 async function cargarCertificaciones() {
   try {
     const response = await fetch('http://localhost:3000/api/exam/certificaciones');
@@ -13,28 +31,41 @@ async function cargarCertificaciones() {
 
     grid.innerHTML = certificaciones.map(cert => {
       const pagado = usuario?.pagado?.[cert.id] || false;
-      const esActiva = cert.activa;
+      const esActiva = !!cert.activa;
       const puedePagar = esActiva && !pagado;
-      const puedeExamen = esActiva && pagado && usuario;
+      const puedeExamen = esActiva && pagado && !!usuario;
+
+      const { firstSrc, candidates } = buildImageCandidates(cert);
 
       return `
         <div class="cert-card ${!esActiva ? 'inactiva' : ''}">
-          <h3>${cert.nombre}</h3>
-          <p>${cert.descripcion}</p>
+          <div class="cert-img-box">
+            <img 
+              src="${firstSrc}"
+              alt="${escapeHtml(cert.nombre || 'Certificación')}"
+              class="cert-img"
+              data-candidates="${candidates.join('|')}"
+              data-idx="0"
+              onerror="retryImage(this)"
+            />
+          </div>
+
+          <h3>${escapeHtml(cert.nombre)}</h3>
+          <p>${escapeHtml(cert.descripcion || '')}</p>
           
           <div class="cert-info">
-            <span><strong>Puntuación mínima:</strong> ${cert.puntuacionMin}%</span>
+            <span><strong>Puntuación mínima:</strong> ${Number(cert.puntuacionMin) || 0}%</span>
           </div>
           <div class="cert-info">
-            <span><strong>Tiempo:</strong> ${cert.tiempoMinutos} min</span>
+            <span><strong>Tiempo:</strong> ${Number(cert.tiempoMinutos) || 0} min</span>
           </div>
           <div class="cert-info">
-            <span><strong>Costo:</strong> $${cert.costo} MXN</span>
+            <span><strong>Costo:</strong> $${Number(cert.costo) || 0} MXN</span>
           </div>
 
           ${!esActiva ? `
             <div class="cert-disponible">
-              Disponible: ${cert.fechaDisponible}
+              Disponible: ${escapeHtml(cert.fechaDisponible || '')}
             </div>
           ` : ''}
 
@@ -56,9 +87,85 @@ async function cargarCertificaciones() {
       `;
     }).join('');
 
+    console.groupCollapsed('CertiCode | Imágenes de certificaciones');
+    certificaciones.forEach(cert => {
+      const { candidates } = buildImageCandidates(cert);
+      console.log(`ID ${cert.id} • ${cert.nombre}:`, candidates);
+    });
+    console.groupEnd();
+
   } catch (err) {
-    mostrarAlerta('error', 'Error al cargar certificaciones');
+    if (typeof mostrarAlerta === 'function') {
+      mostrarAlerta('error', 'Error al cargar certificaciones');
+    } else {
+      console.error('Error al cargar certificaciones');
+    }
   }
+}
+
+function buildImageCandidates(cert) {
+  const FALLBACKS = [
+    'img/cert-placeholder.svg',
+    'img/cert-placeholder-svg', // por si el archivo está con este nombre
+  ];
+
+  let candidates = [];
+
+  // 1) Si la API trae cert.imagen, úsala
+  let raw = (cert && cert.imagen ? String(cert.imagen).trim() : '');
+  if (raw) {
+    if (!/^img\//i.test(raw) && !/^https?:\/\//i.test(raw)) raw = 'img/' + raw;
+    candidates.push(raw);
+    const base = raw.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '');
+    const extTry = [`${base}.svg`, `${base}.png`, `${base}.webp`, `${base}.jpg`, `${base}.jpeg`];
+    candidates = uniqueList(candidates.concat(extTry));
+  } else {
+    // 2) Si NO viene imagen, adivina por nombre de la certificación
+    const guess = guessImageByName(cert?.nombre);
+    if (guess) {
+      candidates.push(guess);
+      const base = guess.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '');
+      const extTry = [`${base}.svg`, `${base}.png`, `${base}.webp`, `${base}.jpg`, `${base}.jpeg`];
+      candidates = uniqueList(candidates.concat(extTry));
+    }
+  }
+
+  // 3) Refuerzos: intenta estos íconos que sabemos que existen en tu /img
+  const KNOWN = ['img/js.svg', 'img/react.svg', 'img/node.svg', 'img/python.svg'];
+  candidates = uniqueList(candidates.concat(KNOWN, FALLBACKS));
+
+  return { firstSrc: candidates[0], candidates };
+}
+
+function guessImageByName(nombre = '') {
+  const n = nombre.toLowerCase();
+  if (/\b(react)\b/.test(n)) return 'img/react.svg';
+  if (/\b(node|node\.js|nodejs)\b/.test(n)) return 'img/node.svg';
+  if (/\b(python)\b/.test(n)) return 'img/python.svg';
+  if (/\b(javascript|java script|js)\b/.test(n)) return 'img/js.svg';
+  return null;
+}
+
+function uniqueList(arr) {
+  const seen = new Set();
+  const out = [];
+  for (const x of arr) {
+    if (!seen.has(x)) {
+      seen.add(x);
+      out.push(x);
+    }
+  }
+  return out;
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 async function pagarCertificacion(certId) {
@@ -66,17 +173,14 @@ async function pagarCertificacion(certId) {
   let usuario = JSON.parse(localStorage.getItem('usuario'));
 
   if (!token || !usuario) {
-    mostrarAlerta('error', 'Debes iniciar sesión');
+    if (typeof mostrarAlerta === 'function') mostrarAlerta('error', 'Debes iniciar sesión');
     return;
   }
 
-  // Aseguramos que pagado exista
-  if (!usuario.pagado) {
-    usuario.pagado = {};
-  }
+  if (!usuario.pagado) usuario.pagado = {};
 
   if (usuario.pagado[certId]) {
-    mostrarAlerta('error', 'Ya pagaste esta certificación');
+    if (typeof mostrarAlerta === 'function') mostrarAlerta('error', 'Ya pagaste esta certificación');
     return;
   }
 
@@ -95,13 +199,13 @@ async function pagarCertificacion(certId) {
     if (response.ok) {
       usuario.pagado[certId] = true;
       localStorage.setItem('usuario', JSON.stringify(usuario));
-      mostrarAlerta('exito', '¡Pago simulado exitoso!');
-      cargarCertificaciones(); // Recarga tarjetas
+      if (typeof mostrarAlerta === 'function') mostrarAlerta('exito', '¡Pago simulado exitoso!');
+      cargarCertificaciones();
     } else {
-      mostrarAlerta('error', data.error);
+      if (typeof mostrarAlerta === 'function') mostrarAlerta('error', data.error || 'Error en el pago');
     }
   } catch (err) {
-    mostrarAlerta('error', 'Error en el pago');
+    if (typeof mostrarAlerta === 'function') mostrarAlerta('error', 'Error en el pago');
   }
 }
 
@@ -110,7 +214,7 @@ async function iniciarExamen(certId) {
   const usuario = JSON.parse(localStorage.getItem('usuario'));
 
   if (!usuario?.pagado?.[certId]) {
-    mostrarAlerta('error', 'Debes pagar antes de iniciar');
+    if (typeof mostrarAlerta === 'function') mostrarAlerta('error', 'Debes pagar antes de iniciar');
     return;
   }
 
@@ -127,11 +231,10 @@ async function iniciarExamen(certId) {
     const data = await response.json();
 
     if (!response.ok) {
-      mostrarAlerta('error', data.error);
+      if (typeof mostrarAlerta === 'function') mostrarAlerta('error', data.error || 'No se pudo iniciar el examen');
       return;
     }
 
-    // Guardar intento en localStorage
     localStorage.setItem('intento', JSON.stringify({
       certId,
       preguntas: data.preguntas,
@@ -141,8 +244,7 @@ async function iniciarExamen(certId) {
     }));
 
     window.location.href = `examen.html?cert=${certId}`;
-
   } catch (err) {
-    mostrarAlerta('error', 'Error al iniciar examen');
+    if (typeof mostrarAlerta === 'function') mostrarAlerta('error', 'Error al iniciar examen');
   }
 }

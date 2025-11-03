@@ -6,53 +6,65 @@ function mostrarAlerta(tipo, mensaje) {
     <span>${mensaje}</span>
     <button class="alerta-cerrar">&times;</button>
   `;
+
   document.body.appendChild(alerta);
 
   // Cerrar al hacer clic
   alerta.querySelector('.alerta-cerrar').onclick = () => alerta.remove();
 
-  // Auto-cerrar
+  // Auto-cerrar después de 4 segundos
   setTimeout(() => {
     if (alerta.parentElement) alerta.remove();
   }, 4000);
 }
 
-// Inyectar estilos
+// Estilos
 const style = document.createElement('style');
 style.textContent = `
   .alerta {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(50px);
+    padding: 1.3rem 2rem;
+    border-radius: 12px;
     color: white;
     font-weight: 600;
-    z-index: 10000;
+    font-size: 1.1rem;
+    z-index: 9999;
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    animation: slideIn 0.4s ease;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    animation: alertaUp 0.35s ease-out forwards;
+    backdrop-filter: blur(6px);
   }
-  .alerta-exito { background: #4caf50; }
-  .alerta-error { background: #f44336; }
+
+  .alerta-exito { background: linear-gradient(135deg, #3EDC81, #2CBF63); }
+  .alerta-error { background: linear-gradient(135deg, #FF5A5A, #D42929); }
+
   .alerta-cerrar {
     background: none;
     border: none;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     cursor: pointer;
     padding: 0;
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: 0.2s;
   }
-  @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+
+  .alerta-cerrar:hover {
+    transform: scale(1.2);
+  }
+
+  @keyframes alertaUp {
+    0% { transform: translateX(-50%) translateY(80px); opacity: 0; }
+    100% { transform: translateX(-50%) translateY(0); opacity: 1; }
   }
 `;
 document.head.appendChild(style);

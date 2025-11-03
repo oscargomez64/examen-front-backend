@@ -6,13 +6,24 @@
   <title>CertiCode | Iniciar Sesión</title>
   <link rel="stylesheet" href="css/estilo.css" />
   <link rel="stylesheet" href="css/alertas.css" />
-  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+
 </head>
 <body>
+
+  <script>
+    (function () {
+      var u = localStorage.getItem('usuario');
+      var t = localStorage.getItem('token');
+      if (u && t) {
+        window.location.replace('index.html');
+      }
+    })();
+  </script>
+
   <div id="header-container"></div>
 
   <main class="login-container">
-    <div class="login-card">
+    <div id="login-card" class="login-card">
       <h2>Iniciar Sesión</h2>
       <form id="form-login">
         <div class="input-group">
@@ -25,9 +36,7 @@
         </div>
         <button type="submit" class="btn-primary">Ingresar</button>
       </form>
-      <p class="demo-info">
-        Usa: <strong>juan123</strong> / <strong>12345</strong>
-      </p>
+      <p class="demo-info">Usa: <strong>juan123</strong> / <strong>12345</strong></p>
     </div>
   </main>
 

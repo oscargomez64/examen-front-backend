@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Cronómetro">
+  <circle cx="64" cy="72" r="44" fill="#ffffff" stroke="#1f2937" stroke-width="6"/>
+  <rect x="52" y="12" width="24" height="16" rx="4" fill="#1f2937"/>
+  <path d="M64 32v12" stroke="#1f2937" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 72l18-18" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
+</svg>
