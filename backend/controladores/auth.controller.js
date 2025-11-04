@@ -66,6 +66,7 @@ const verificarToken = (req, res, next) => {
 const logout = (req, res) => {
   const token = req.token;
   sesiones.delete(token);
+  console.log(`Cerró sesión ${sesiones} a las ${Date().toLocaleString('es-MX')}`);
   res.json({ mensaje: "Sesión cerrada" });
 };
 

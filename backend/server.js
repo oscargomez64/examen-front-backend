@@ -6,6 +6,8 @@ const contactoRoutes = require('./rutas/contacto.routes');
 const ALLOWED_ORIGINS = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
+  'http://172.20.10.2:5500',
+  'http://172.20.10.4:5500'
   // Ingrese otros IP clientes aquí
 ];
 
