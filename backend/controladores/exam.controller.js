@@ -129,8 +129,10 @@ const pagar = (req, res) => {
 
 
 // === GENERAR PDF ===
-// Reemplaza tu generarPDF con este:
-const generarPDF = (req, res) => {
+
+const generarCertificado = require('../utils/generarPDF');
+
+const generarPDF = async (req, res) => {
   const userId = req.userId;
   const certId = parseInt(req.query.certId);
 
@@ -141,64 +143,20 @@ const generarPDF = (req, res) => {
     return res.status(403).json({ error: "No autorizado para certificado" });
   }
 
-  const doc = new PDFDocument({ 
-    size: 'A4', 
-    layout: 'landscape',
-    margin: 50 
-  });
-
-  res.set({
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': `attachment; filename="Certificado_${cert.nombre.replace(/ /g,'_')}.pdf"`
-  });
-  doc.pipe(res);
-
-  // LOGOS CON PATH CORRECTO
-  const imgPath = path.join(__dirname, '../../frontend/img/');
-  
-  // Fondo elegante
-  doc.rect(0, 0, doc.page.width, doc.page.height).fill('#f4f7fa');
-  
-  // TÍTULOS
-  doc.fontSize(32).fillColor('#6e8efb').text('CERTIFICADO DE COMPETENCIA', 50, 80);
-  
-  doc.fontSize(24).fillColor('#333').text('CertiCode', 50, 120);
-  doc.fontSize(18).text('Certifica tu futuro, domina el código', 50, 145);
-
-  // NOMBRE USUARIO (CENTRO)
-  doc.fontSize(28).fillColor('#2c3e50').font('Helvetica-Bold')
-     .text(usuario.nombre, 100, 220, { width: 600, align: 'center' });
-
-  // CERTIFICACIÓN
-  doc.fontSize(20).fillColor('#6e8efb').text(cert.nombre, 100, 280, { width: 600, align: 'center' });
-  
-  // CALIFICACIÓN
-  doc.fontSize(16).text(`Calificación obtenida: ${usuario.intento.calificacion}%`, 100, 330, { align: 'center' });
-
-  // FECHA Y CIUDAD
-  const hoy = new Date().toLocaleDateString('es-MX', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
-  doc.fontSize(14).fillColor('#666')
-     .text(`Aguascalientes, Ags. ${hoy}`, 100, 380, { align: 'center' });
-
-  // FIRMAS
-  const yFirma = 450;
-  
-  // Instructor
-  doc.fontSize(14).text('Dra. Georgina Salazar Partida', 80, yFirma)
-     .fontSize(12).text('Instructora CertiCode', 80, yFirma + 20);
-  const firmaInst = `${imgPath}instructor_firma.png`;
-  if (fs.existsSync(firmaInst)) doc.image(firmaInst, 80, yFirma - 30, { width: 80 });
-
-  // CEO
-  doc.fontSize(14).text('Ing. Carlos Mendoza', 450, yFirma)
-     .fontSize(12).text('CEO CertiCode', 450, yFirma + 20);
-  const firmaCEO = `${imgPath}ceo_firma.png`;
-  if (fs.existsSync(firmaCEO)) doc.image(firmaCEO, 450, yFirma - 30, { width: 80 });
-
-  doc.end();
+  try {
+    const pdfBuffer = await generarCertificado(usuario, cert, usuario.intento.calificacion);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="Certificado_${cert.nombre.replace(/ /g,'_')}.pdf"`
+    });
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al generar el certificado" });
+  }
 };
+
+
 
 // === EXPORTAR AL FINAL ===
 module.exports = { start, submit, generarPDF, pagar };

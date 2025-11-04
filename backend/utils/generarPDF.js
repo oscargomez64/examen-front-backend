@@ -1,15 +1,7 @@
-// backend/utils/generarPDF.js
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Genera un certificado en formato PDF con diseño elegante y disposición formal.
- * @param {Object} usuario - Datos del usuario.
- * @param {Object} cert - Información de la certificación.
- * @param {number} calificacion - Calificación obtenida.
- * @returns {Promise<Buffer>} PDF generado.
- */
 function generarCertificado(usuario, cert, calificacion) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
@@ -20,104 +12,99 @@ function generarCertificado(usuario, cert, calificacion) {
 
     const buffers = [];
     doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => resolve(Buffer.concat(buffers)));
-
-    /* === Fondo y marco decorativo === */
-    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#f8f9ff');
-    doc.lineWidth(8)
-       .rect(20, 20, doc.page.width - 40, doc.page.height - 40)
-       .stroke('#6e8efb');
-
-    /* === Logo institucional === */
-    const logoPath = path.join(__dirname, '../frontend/img/logo.png');
-    if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, 50, 40, { width: 100 });
-    }
-
-    /* === Encabezado === */
-    doc.font('Helvetica-Bold')
-       .fontSize(36)
-       .fillColor('#6e8efb')
-       .text('CERTIFICADO DE COMPETENCIA', 0, 160, {
-         align: 'center',
-         width: doc.page.width
-       });
-
-    /* === Subtítulo === */
-    doc.font('Helvetica')
-       .fontSize(20)
-       .fillColor('#333')
-       .text('Se hace constar que:', 0, 230, {
-         align: 'center',
-         width: doc.page.width
-       });
-
-    /* === Nombre del participante === */
-    doc.font('Helvetica-Bold')
-       .fontSize(28)
-       .fillColor('#6e8efb')
-       .text(usuario.nombre, 0, 280, {
-         align: 'center',
-         width: doc.page.width
-       });
-
-    /* === Cuerpo del certificado === */
-    doc.font('Helvetica')
-       .fontSize(18)
-       .fillColor('#333')
-       .text('ha completado exitosamente la certificación en', 0, 330, { align: 'center' })
-       .text(cert.nombre, 0, 355, {
-         align: 'center',
-         width: doc.page.width
-       });
-
-    doc.fontSize(16)
-       .text(`con una calificación de ${calificacion}%`, 0, 400, { align: 'center' });
-
-    /* === Fecha y lugar === */
-    const hoy = new Date().toLocaleDateString('es-MX', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
+    doc.on('end', () => {
+      console.log('PDF generado correctamente');
+      resolve(Buffer.concat(buffers));
     });
-    doc.font('Helvetica-Oblique')
-       .fontSize(14)
-       .fillColor('#555')
-       .text(`Aguascalientes, Ags. a ${hoy}`, 0, 450, { align: 'center' });
+    doc.on('error', (err) => {
+      console.error('Error en PDFKit:', err);
+      reject(err);
+    });
 
-    /* === Firmas === */
-    const firmaInstPath = path.join(__dirname, '../frontend/img/instructor_firma.png');
-    const firmaCEOPath = path.join(__dirname, '../frontend/img/ceo_firma.png');
+    try {
+      const imgBase = path.join(__dirname, '../img');
 
-    // Firma del instructor
-    if (fs.existsSync(firmaInstPath)) {
-      doc.image(firmaInstPath, 180, 480, { width: 120 });
+      doc.rect(0, 0, doc.page.width, doc.page.height).fill('#ffffff');
+
+      const gradient = doc.linearGradient(0, 0, doc.page.width, 0);
+      gradient.stop(0, '#6e8efb').stop(1, '#a777e3');
+      doc.rect(0, 0, doc.page.width, 70).fill(gradient);
+
+      doc.lineWidth(5)
+         .rect(25, 25, doc.page.width - 50, doc.page.height - 50)
+         .stroke('#a777e3');
+
+      const logoPath = path.join(imgBase, 'logo.png');
+      if (fs.existsSync(logoPath)) {
+        doc.image(logoPath, 50, 20, { width: 90 });
+      }
+
+      doc.font('Helvetica-Bold')
+         .fontSize(34)
+         .fillColor('#333')
+         .text('CERTIFICADO DE COMPETENCIA', 0, 130, { align: 'center' });
+
+      doc.font('Helvetica')
+         .fontSize(18)
+         .fillColor('#444')
+         .text('Por haber completado satisfactoriamente la certificación en:', 0, 190, { align: 'center' });
+
+      doc.font('Helvetica-Bold')
+         .fontSize(26)
+         .fillColor('#6e8efb')
+         .text(cert.nombre, 0, 230, { align: 'center' });
+
+      doc.font('Helvetica')
+         .fontSize(16)
+         .fillColor('#333')
+         .text('Otorgado a:', 0, 280, { align: 'center' });
+
+      doc.font('Helvetica-Bold')
+         .fontSize(30)
+         .fillColor('#111')
+         .text(usuario.nombre, 0, 310, { align: 'center' });
+
+      doc.font('Helvetica')
+         .fontSize(16)
+         .text(`Con una calificación final de ${calificacion}%`, 0, 365, { align: 'center' });
+
+      const hoy = new Date().toLocaleDateString('es-MX', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+      doc.font('Helvetica-Oblique')
+         .fontSize(13)
+         .fillColor('#555')
+         .text(`Aguascalientes, Ags. — ${hoy}`,0, 40, { align: 'center' });
+
+      const firmaInstPath = path.join(imgBase, 'instructor_firma.png');
+      const firmaCEOPath = path.join(imgBase, 'ceo_firma.png');
+
+      const firmaY = 400;
+      const centroX = doc.page.width / 2;
+      const anchoFirma = 120;
+      const espacio = 210;
+
+      if (fs.existsSync(firmaInstPath)) {
+        doc.image(firmaInstPath, centroX - espacio - anchoFirma / 2, firmaY, { width: anchoFirma });
+      }
+      doc.font('Helvetica').fontSize(12).fillColor('#333')
+         .text('Dr. Uriel Ezequiel Rosales', centroX - espacio - 80, firmaY + 100, { width: 160, align: 'center' })
+         .text('Instructor', centroX - espacio - 80, firmaY + 120, { width: 160, align: 'center' });
+
+      if (fs.existsSync(firmaCEOPath)) {
+        doc.image(firmaCEOPath, centroX + espacio - anchoFirma / 2, firmaY, { width: anchoFirma });
+      }
+      doc.text('Ing. Oscar Gómez Ruiz', centroX + espacio - 80, firmaY + 100, { width: 160, align: 'center' })
+         .text('CEO de CertiCode', centroX + espacio - 80, firmaY + 120, { width: 160, align: 'center' });
+
+      doc.end();
+    } catch (err) {
+      console.error('Error al generar PDF:', err);
+      reject(err);
     }
-    doc.font('Helvetica')
-       .fontSize(12)
-       .fillColor('#333')
-       .text('Dr. Uriel Ezequiel Rosales', 160, 610, { width: 160, align: 'center' })
-       .text('Instructor', 160, 625, { width: 160, align: 'center' });
-
-    // Firma del CEO
-    if (fs.existsSync(firmaCEOPath)) {
-      doc.image(firmaCEOPath, 500, 480, { width: 120 });
-    }
-    doc.font('Helvetica')
-       .fontSize(12)
-       .text('Ing. Oscar Gómez Ruiz', 480, 610, { width: 160, align: 'center' })
-       .text('CEO de CertiCode', 480, 625, { width: 160, align: 'center' });
-
-    /* === Pie de página === */
-    doc.font('Helvetica-Oblique')
-       .fontSize(10)
-       .fillColor('#999')
-       .text('CertiCode — Certifica tu futuro, domina el código.', 0, 570, {
-         align: 'center',
-         width: doc.page.width
-       });
-
-    doc.end();
   });
 }
 

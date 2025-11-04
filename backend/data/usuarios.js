@@ -55,6 +55,14 @@ const usuarios = [
     nombre: "Azael Fajardo Espino",
     pagado: {},
     intento: null
+  },
+   {
+    id: 8,
+    cuenta: "ginna",
+    password: "admin",
+    nombre: "Dra. Georgina Salazar Partida",
+    pagado: {},
+    intento: null
   }
 ];
 
