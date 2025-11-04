@@ -85,7 +85,7 @@ async function enviarRespuestas() {
 
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch('http://172.20.10.3:3000/api/exam/submit', {
+    const response = await fetch('http://localhost:3000/api/exam/submit', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ async function enviarRespuestas() {
       if (data.aprobado) {
         mostrarAlerta('felicitacion', '¡FELICIDADES! Descargando tu certificado...');
 
-        fetch(`http://172.20.10.3:3000/api/exam/pdf?certId=${intento.certId}`, {
+        fetch(`http://localhost:3000/api/exam/pdf?certId=${intento.certId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         .then(r => r.blob())

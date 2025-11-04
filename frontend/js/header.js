@@ -94,7 +94,7 @@ function cargarHeader() {
 // Logout
 async function logout() {
   try {
-    const res = await fetch("http://172.20.10.3:3000/api/auth/logout", {
+    const res = await fetch("http://localhost:3000/api/auth/logout", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${localStorage.getItem('token')}`
