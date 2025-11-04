@@ -92,13 +92,36 @@ function cargarHeader() {
 }
 
 // Logout
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('usuario');
-  if (typeof mostrarAlerta === 'function') {
-    mostrarAlerta('exito', 'Sesión cerrada');
+async function logout() {
+  try {
+    const res = await fetch("http://localhost:3000/api/auth/logout", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    if (res.ok) {
+      if (typeof mostrarAlerta === 'function') {
+        mostrarAlerta('exito', 'Sesión cerrada');
+      }
+    } else {
+      const data = await res.json();
+      if (typeof mostrarAlerta === 'function') {
+        mostrarAlerta('error', 'Error al cerrar sesión')
+      }
+    }
+  } catch (err) {
+    console.error("Error al conectar con el servidor", err);
+    if (typeof mostrarAlerta === 'function') {
+      mostrarAlerta('error', 'Error al conectar con el servidor');
+    }
+  } finally {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+  
+    setTimeout(() => (window.location.href = 'index.html'), 1000);
   }
-  setTimeout(() => (window.location.href = 'index.html'), 1000);
 }
 
 // Cargar

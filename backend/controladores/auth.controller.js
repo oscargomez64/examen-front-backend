@@ -24,6 +24,8 @@ const login = (req, res) => {
   // GUARDAR EN MAPA DE SESIONES
   sesiones.set(token, usuario.id);
 
+  console.log(`Inició sesión ${usuario.cuenta} a las ${Date().toLocaleString('es-MX')}`);
+
   res.json({
     mensaje: "Acceso permitido",
     token, // ← MISMO TOKEN

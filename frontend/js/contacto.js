@@ -12,7 +12,7 @@ document.getElementById('form-contacto').addEventListener('submit', async (e) =>
   }
 
   try {
-    const response = await fetch('http://192.168.1.9:3000/api/contacto', {
+    const response = await fetch('http://localhost:3000/api/contacto', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
