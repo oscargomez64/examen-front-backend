@@ -63,3 +63,42 @@ main p:last-of-type {
   text-align: center;
   margin-top: 2.5rem;
 }
+
+.collaborators {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 50px;
+  flex-wrap: wrap; /* makes it responsive */
+}
+
+.collab {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  padding: 20px;
+  width: 200px;
+  transition: transform 0.2s;
+}
+
+.collab:hover {
+  transform: translateY(-5px);
+}
+
+.collab img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.collab h4 {
+  margin: 10px 0 5px;
+}
+
+.collab p {
+  color: #666;
+  font-size: 0.9em;
+}

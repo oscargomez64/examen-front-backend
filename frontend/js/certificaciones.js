@@ -1,3 +1,4 @@
+// frontend/js/certificaciones.js
 document.addEventListener('DOMContentLoaded', () => {
   cargarCertificaciones();
 });
@@ -16,19 +17,17 @@ async function cargarCertificaciones() {
       const puedePagar = esActiva && !pagado;
       const puedeExamen = esActiva && pagado && !!usuario;
 
-      // ✅ Solo SVG: si no viene, usa el placeholder
-      const imgSrc = cert.imagen?.endsWith('.svg') 
-        ? cert.imagen 
-        : `img/${(cert.imagen || 'cert-placeholder')}.svg`;
+      const { firstSrc, candidates } = buildImageCandidates(cert);
 
       return `
         <div class="cert-card ${!esActiva ? 'inactiva' : ''}">
           <div class="cert-img-box">
             <img 
-              src="${imgSrc}" 
-              alt="${escapeHtml(cert.nombre || 'Certificación')}" 
+              src="${firstSrc}"
+              alt="${escapeHtml(cert.nombre || 'Certificación')}"
               class="cert-img"
-              onerror="this.src='img/cert-placeholder.svg'"
+              data-candidates="${candidates.join('|')}"
+              data-idx="0"
             />
           </div>
 
@@ -69,13 +68,75 @@ async function cargarCertificaciones() {
       `;
     }).join('');
 
+    console.groupCollapsed('CertiCode | Imágenes de certificaciones');
+    certificaciones.forEach(cert => {
+      const { candidates } = buildImageCandidates(cert);
+      console.log(`ID ${cert.id} • ${cert.nombre}:`, candidates);
+    });
+    console.groupEnd();
+
   } catch (err) {
     if (typeof mostrarAlerta === 'function') {
       mostrarAlerta('error', 'Error al cargar certificaciones');
     } else {
-      console.error('Error al cargar certificaciones:', err);
+      console.error('Error al cargar certificaciones');
     }
   }
+}
+
+function buildImageCandidates(cert) {
+  const FALLBACKS = [
+    'img/cert-placeholder.svg',
+    'img/cert-placeholder-svg', // por si el archivo está con este nombre
+  ];
+
+  let candidates = [];
+
+  // 1) Si la API trae cert.imagen, úsala
+  let raw = (cert && cert.imagen ? String(cert.imagen).trim() : '');
+  if (raw) {
+    if (!/^img\//i.test(raw) && !/^https?:\/\//i.test(raw)) raw = 'img/' + raw;
+    candidates.push(raw);
+    const base = raw.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '');
+    const extTry = [`${base}.svg`, `${base}.png`, `${base}.webp`, `${base}.jpg`, `${base}.jpeg`];
+    candidates = uniqueList(candidates.concat(extTry));
+  } else {
+    // 2) Si NO viene imagen, adivina por nombre de la certificación
+    const guess = guessImageByName(cert?.nombre);
+    if (guess) {
+      candidates.push(guess);
+      const base = guess.replace(/\.(svg|png|webp|jpg|jpeg)$/i, '');
+      const extTry = [`${base}.svg`, `${base}.png`, `${base}.webp`, `${base}.jpg`, `${base}.jpeg`];
+      candidates = uniqueList(candidates.concat(extTry));
+    }
+  }
+
+  // 3) Refuerzos: intenta estos íconos que sabemos que existen en tu /img
+  const KNOWN = ['img/js.svg', 'img/react.svg', 'img/node.svg', 'img/python.svg'];
+  candidates = uniqueList(candidates.concat(KNOWN, FALLBACKS));
+
+  return { firstSrc: candidates[0], candidates };
+}
+
+function guessImageByName(nombre = '') {
+  const n = nombre.toLowerCase();
+  if (/\b(react)\b/.test(n)) return 'img/react.svg';
+  if (/\b(node|node\.js|nodejs)\b/.test(n)) return 'img/node.svg';
+  if (/\b(python)\b/.test(n)) return 'img/python.svg';
+  if (/\b(javascript|java script|js)\b/.test(n)) return 'img/js.svg';
+  return null;
+}
+
+function uniqueList(arr) {
+  const seen = new Set();
+  const out = [];
+  for (const x of arr) {
+    if (!seen.has(x)) {
+      seen.add(x);
+      out.push(x);
+    }
+  }
+  return out;
 }
 
 function escapeHtml(s) {
